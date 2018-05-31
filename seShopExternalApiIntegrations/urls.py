@@ -19,6 +19,5 @@ from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('nova_poshta.urls')),
-    path('', RedirectView.as_view(url='/api/')),
+    path('', include('nova_poshta.urls')),
 ]
