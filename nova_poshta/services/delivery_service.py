@@ -1,5 +1,5 @@
 from nova_poshta.models import Delivery
-from nova_poshta.services.TrackingService import Status, TrackingService
+from nova_poshta.services.tracking_service import TrackingService
 from nova_poshta.services.delivery_price_service import DeliveryPriceService
 from nova_poshta.services.delivery_time_service import DeliveryTimeService
 
@@ -53,7 +53,7 @@ class DeliveryService:
 
     @staticmethod
     def create_delivery(request_body):
-        delivery = Delivery(status=Status.CREATED, details=request_body)
+        delivery = Delivery(status='1', details=request_body)
         delivery.save()
 
         return {'status': 200, 'data': {'id': delivery.id}}

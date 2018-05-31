@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from nova_poshta.services.TrackingService import TrackingService
+from nova_poshta.services.tracking_service import TrackingService
 from nova_poshta.services.city_list_service import CityListService
 from nova_poshta.services.delivery_service import DeliveryService
 from nova_poshta.services.warehouse_list_service import WarehouseListService
@@ -75,3 +75,16 @@ def handle_delivery(request):
                 return Response(status=status.HTTP_400_BAD_REQUEST, headers=headers, data=response)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'status': 400, 'message': err})
+
+
+@api_view(['GET'])
+def get_delivery_by_id(request, delivery_id):
+    if request.method == 'GET':
+        headers = {'Content-Type': 'application/json'}
+
+        response = TrackingService.get_status(delivery_id)
+
+        if response['status'] == 200:
+            return Response(status=status.HTTP_200_OK, headers=headers, data=response)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND, data=response)
