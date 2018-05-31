@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from nova_poshta.services.TrackingService import TrackingService
 from nova_poshta.services.city_list_service import CityListService
 from nova_poshta.services.delivery_service import DeliveryService
 from nova_poshta.services.warehouse_list_service import WarehouseListService
@@ -24,7 +25,7 @@ def get_city_list_by_name(request):
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST, headers=headers, data=response_body)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=err)
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'status': 400, 'message': err})
 
 
 @api_view(['GET'])
@@ -43,7 +44,7 @@ def get_warehouse_list_by_city_name(request):
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST, headers=headers, data=response_body)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=err)
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'status': 400, 'message': err})
 
 
 @api_view(['GET', 'POST'])
@@ -62,9 +63,15 @@ def handle_delivery(request):
 
     if request.method == 'POST':
         body = request.data
+        headers = {'Content-Type': 'application/json'}
 
-        delivery_service = DeliveryService()
-        response = delivery_service.create_delivery(body)
+        err = TrackingService.validate_query_params(body)
+        if not err:
+            response = DeliveryService.create_delivery(body)
 
-
-
+            if response['status'] == 200:
+                return Response(status=status.HTTP_200_OK, headers=headers, data=response)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST, headers=headers, data=response)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'status': 400, 'message': err})

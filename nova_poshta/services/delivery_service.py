@@ -1,8 +1,10 @@
+from nova_poshta.models import Delivery
+from nova_poshta.services.TrackingService import Status, TrackingService
 from nova_poshta.services.delivery_price_service import DeliveryPriceService
 from nova_poshta.services.delivery_time_service import DeliveryTimeService
 
 
-class Delivery:
+class DeliveryResponseObject:
     def __init__(self):
         self.price = None
         self.expected_arrival_time = None
@@ -16,7 +18,7 @@ class Delivery:
 class DeliveryService:
 
     def __init__(self):
-        self.delivery = Delivery()
+        self.delivery = DeliveryResponseObject()
         self.err_price = None
         self.err_time = None
 
@@ -49,8 +51,12 @@ class DeliveryService:
 
         return self.delivery
 
-    def create_delivery(self, request_body):
-        pass
+    @staticmethod
+    def create_delivery(request_body):
+        delivery = Delivery(status=Status.CREATED, details=request_body)
+        delivery.save()
+
+        return {'status': 200, 'data': {'id': delivery.id}}
 
     def _is_valid_query_params(self, query_params):
         self.err_price = DeliveryPriceService.validate_query_params(query_params)
